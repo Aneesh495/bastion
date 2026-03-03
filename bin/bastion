@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+"""Executable wrapper for the Bastion security kernel CLI."""
+
+import sys
+from pathlib import Path
+
+# Ensure bastion package is in sys.path
+repo_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(repo_root))
+
+from bastion.cli import main
+
+if __name__ == "__main__":
+    main()
