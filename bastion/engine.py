@@ -171,7 +171,14 @@ class DuckDBCLIEngine(DatabaseEngine):
     """High-performance DuckDB execution engine utilizing DuckDB binary."""
 
     def __init__(self, db_path: str = ":memory:"):
-        self.db_path = db_path
+        self.is_temp = False
+        if db_path == ":memory:":
+            import tempfile
+            self.temp_dir = tempfile.mkdtemp(prefix="bastion_duckdb_")
+            self.db_path = os.path.join(self.temp_dir, "session.duckdb")
+            self.is_temp = True
+        else:
+            self.db_path = db_path
         self.binary = shutil.which("duckdb") or "/opt/homebrew/bin/duckdb"
         if not os.path.exists(self.binary):
             raise RuntimeError(f"DuckDB binary not found at {self.binary}")
@@ -231,6 +238,13 @@ class DuckDBCLIEngine(DatabaseEngine):
         stdout, stderr = proc.communicate(input=sql_script)
         if proc.returncode != 0:
             raise RuntimeError(f"DuckDB script execution error: {stderr}")
+
+    def close(self) -> None:
+        if self.is_temp and hasattr(self, "temp_dir") and os.path.exists(self.temp_dir):
+            try:
+                shutil.rmtree(self.temp_dir, ignore_errors=True)
+            except Exception:
+                pass
 
 
 def create_engine(engine_type: str = "auto", db_path: str = ":memory:") -> DatabaseEngine:
