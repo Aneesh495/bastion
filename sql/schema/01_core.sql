@@ -200,6 +200,7 @@ CREATE TABLE IF NOT EXISTS core_compute_assets (
     assigned_role_id    VARCHAR(64) REFERENCES core_iam_roles(role_id),
     is_crown_jewel      BOOLEAN NOT NULL DEFAULT FALSE,
     criticality_score   NUMERIC(5,2) NOT NULL DEFAULT 50.00 CHECK (criticality_score BETWEEN 0.0 AND 100.0),
+    is_compromised      BOOLEAN NOT NULL DEFAULT FALSE,
     is_quarantined      BOOLEAN NOT NULL DEFAULT FALSE,
     state               VARCHAR(32) NOT NULL DEFAULT 'RUNNING' CHECK (state IN ('RUNNING', 'STOPPED', 'TERMINATED', 'ISOLATED')),
     created_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
