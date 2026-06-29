@@ -206,6 +206,19 @@ CREATE TABLE IF NOT EXISTS core_compute_assets (
     created_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS entity_asset_ip_leases (
+    lease_id            VARCHAR(64) PRIMARY KEY,
+    asset_id            VARCHAR(64) NOT NULL REFERENCES core_compute_assets(asset_id),
+    ip_address          VARCHAR(64) NOT NULL,
+    mac_address         VARCHAR(32) NOT NULL,
+    lease_start         TIMESTAMP NOT NULL,
+    lease_end           TIMESTAMP,
+    interface_id        VARCHAR(64) NOT NULL,
+    is_primary          BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_lease_interval CHECK (lease_end IS NULL OR lease_end > lease_start)
+);
+
 CREATE TABLE IF NOT EXISTS core_storage_buckets (
     bucket_id           VARCHAR(64) PRIMARY KEY,
     account_id          VARCHAR(64) NOT NULL REFERENCES core_cloud_accounts(account_id),
