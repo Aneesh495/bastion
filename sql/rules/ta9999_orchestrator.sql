@@ -1,6 +1,6 @@
 -- ============================================================================
 -- BASTION: ZERO-TRUST IDENTITY GRAPH AND THREAT DETECTION KERNEL
--- File: sql/rules/orchestrator.sql
+-- File: sql/rules/ta9999_orchestrator.sql
 -- Description: Unified multi-tactic detection rule orchestrator view, alert
 --              suppression evaluation, kill-chain stage progression, and composite scoring.
 -- Dialect: ANSI SQL / DuckDB / PostgreSQL
