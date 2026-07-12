@@ -93,3 +93,19 @@ INSERT INTO core_credentials (credential_id, principal_id, credential_type, key_
 ('cred-04', 'svc-billing-01', 'API_ACCESS_KEY',  'AKIA998877665EXAMPLE', FALSE, TRUE),
 ('cred-05', 'usr-admin-01',   'SSH_PUBLIC_KEY',  'SHA256:4x8q1b9c2a8f3e',FALSE, TRUE)
 ON CONFLICT (credential_id) DO NOTHING;
+
+-- ----------------------------------------------------------------------------
+-- 6. Canonical IAM Graph Nodes and Role Assumption Edges
+-- ----------------------------------------------------------------------------
+
+INSERT INTO graph_nodes (node_id, node_type, canonical_arn, display_name, account_id, criticality_tier, is_compromised, is_quarantined, is_active) VALUES
+('usr-devops-01',        'PRINCIPAL', 'arn:aws:iam::acc-prod-01:user/devops.engineer', 'devops.engineer', 'acc-prod-01', 2, FALSE, FALSE, TRUE),
+('role-devops-01',       'ROLE',      'arn:aws:iam::acc-prod-01:role/DevOpsRole',      'DevOpsRole',      'acc-prod-01', 2, FALSE, FALSE, TRUE),
+('role-admin-breakglass','ROLE',      'arn:aws:iam::acc-prod-01:role/BreakGlassAdmin', 'BreakGlassAdmin', 'acc-prod-01', 1, FALSE, FALSE, TRUE)
+ON CONFLICT (node_id) DO NOTHING;
+
+INSERT INTO graph_edges (edge_id, source_node_id, target_node_id, edge_type, edge_weight, protocol, port_range, action_granted, is_active) VALUES
+('ge-iam-01', 'usr-devops-01',  'role-devops-01',        'CAN_ASSUME_ROLE', 1.0, 'HTTPS', '443', 'sts:AssumeRole', TRUE),
+('ge-iam-02', 'role-devops-01', 'role-admin-breakglass', 'CAN_ASSUME_ROLE', 1.0, 'HTTPS', '443', 'sts:AssumeRole', TRUE)
+ON CONFLICT (edge_id) DO NOTHING;
+

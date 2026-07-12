@@ -30,6 +30,10 @@ INSERT INTO telemetry_process_events (
  'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', FALSE, 'MEDIUM')
 ON CONFLICT (process_guid) DO NOTHING;
 
+UPDATE core_compute_assets SET is_compromised = TRUE WHERE asset_id = 'ast-web-01';
+UPDATE graph_nodes SET is_compromised = TRUE WHERE node_id = 'node-web-01';
+
+
 -- Step 3: Discovery - Internal Network Port Sweep (T1046)
 INSERT INTO telemetry_vpc_flow_logs (
     flow_id, account_id, interface_id, src_addr, dst_addr, src_port, dst_port,
