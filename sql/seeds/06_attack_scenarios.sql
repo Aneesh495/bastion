@@ -179,3 +179,67 @@ INSERT INTO audit_crypto_ledger (
     '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'
 )
 ON CONFLICT (block_height) DO NOTHING;
+
+-- ----------------------------------------------------------------------------
+-- 5. Impossible Travel Authentication Anomaly
+-- ----------------------------------------------------------------------------
+
+INSERT INTO telemetry_authentication_events (
+    auth_event_id, account_id, event_time, principal_id, username_asserted,
+    auth_protocol, auth_status, source_ip, source_country, source_city,
+    source_latitude, source_longitude, user_agent, mfa_authenticated, mfa_method
+) VALUES
+('auth-geo-01', 'acc-prod-01', '2026-10-15 13:00:00', 'usr-admin-01', 'alice.admin', 'SAML_2_0', 'SUCCESS', '198.51.100.12', 'US', 'New York', 40.7128, -74.0060, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', TRUE, 'FIDO2_WEBAUTHN'),
+('auth-geo-02', 'acc-prod-01', '2026-10-15 13:15:00', 'usr-admin-01', 'alice.admin', 'PASSWORD', 'SUCCESS', '198.51.100.77', 'GB', 'London',   51.5074,  -0.1278, 'python-requests/2.31.0', FALSE, 'NONE')
+ON CONFLICT (auth_event_id) DO NOTHING;
+
+-- ----------------------------------------------------------------------------
+-- 6. Distributed Password Spray / Credential Stuffing Campaign
+-- ----------------------------------------------------------------------------
+
+INSERT INTO telemetry_authentication_events (
+    auth_event_id, account_id, event_time, principal_id, username_asserted,
+    auth_protocol, auth_status, source_ip, source_country, source_city,
+    source_latitude, source_longitude, user_agent, mfa_authenticated, mfa_method
+) VALUES
+('auth-spray-01', 'acc-prod-01', '2026-10-15 14:00:01', 'usr-admin-01',   'alice.admin',     'PASSWORD', 'FAILURE', '198.51.100.199', 'RU', 'Moscow', 55.7558, 37.6173, 'Hydra/9.5', FALSE, 'NONE'),
+('auth-spray-02', 'acc-prod-01', '2026-10-15 14:00:02', 'usr-devops-01',  'bob.devops',      'PASSWORD', 'FAILURE', '198.51.100.199', 'RU', 'Moscow', 55.7558, 37.6173, 'Hydra/9.5', FALSE, 'NONE'),
+('auth-spray-03', 'acc-prod-01', '2026-10-15 14:00:03', 'usr-analyst-01', 'charlie.analyst', 'PASSWORD', 'FAILURE', '198.51.100.200', 'RU', 'Moscow', 55.7558, 37.6173, 'Hydra/9.5', FALSE, 'NONE'),
+('auth-spray-04', 'acc-prod-01', '2026-10-15 14:00:04', 'usr-intern-01',  'dave.intern',     'PASSWORD', 'FAILURE', '198.51.100.200', 'RU', 'Moscow', 55.7558, 37.6173, 'Hydra/9.5', FALSE, 'NONE'),
+('auth-spray-05', 'acc-prod-01', '2026-10-15 14:00:05', 'usr-dormant-01', 'eve.contractor',  'PASSWORD', 'FAILURE', '198.51.100.201', 'RU', 'Moscow', 55.7558, 37.6173, 'Hydra/9.5', FALSE, 'NONE'),
+('auth-spray-06', 'acc-prod-01', '2026-10-15 14:00:06', 'usr-admin-01',   'alice.admin',     'PASSWORD', 'FAILURE', '198.51.100.201', 'RU', 'Moscow', 55.7558, 37.6173, 'Hydra/9.5', FALSE, 'NONE')
+ON CONFLICT (auth_event_id) DO NOTHING;
+
+-- ----------------------------------------------------------------------------
+-- 7. Massive Asymmetric Data Egress Exfiltration Flow
+-- ----------------------------------------------------------------------------
+
+INSERT INTO telemetry_vpc_flow_logs (
+    flow_id, account_id, interface_id, src_addr, dst_addr, src_port, dst_port,
+    protocol, packets, bytes_transferred, start_time, end_time, action
+) VALUES
+('fl-exfil-01', 'acc-prod-01', 'eni-web-01', '10.0.1.55', '198.51.100.99', 49820, 443, 6, 6200000, 8500000000, '2026-10-15 15:30:00', '2026-10-15 15:45:00', 'ACCEPT')
+ON CONFLICT (flow_id) DO NOTHING;
+
+-- ----------------------------------------------------------------------------
+-- 8. Domain Typosquatting in DNS Queries
+-- ----------------------------------------------------------------------------
+
+INSERT INTO telemetry_dns_queries (
+    query_id, asset_id, query_time, client_ip, query_name, query_type, response_code, resolved_ip, ttl_seconds, entropy_score
+) VALUES
+('dns-typo-01', 'ast-web-01', '2026-10-15 13:45:00', '10.0.1.55', 'oktaa.com', 'A', 'NOERROR', '198.51.100.88', 300, 3.20),
+('dns-typo-02', 'ast-web-01', '2026-10-15 13:46:00', '10.0.1.55', 'githubb.com', 'A', 'NOERROR', '198.51.100.89', 300, 3.15)
+ON CONFLICT (query_id) DO NOTHING;
+
+-- ----------------------------------------------------------------------------
+-- 9. Cross-Account Identity Alias Principal
+-- ----------------------------------------------------------------------------
+
+INSERT INTO core_identity_principals (
+    principal_id, org_id, account_id, username, email, arn,
+    principal_type, department, is_service_account, is_privileged, is_active
+) VALUES
+('usr-admin-okta', 'org-01', 'acc-sec-01', 'alice.admin.okta', 'alice.admin@acme-defense.internal', 'arn:okta:user/alice.admin', 'HUMAN_USER', 'INFRASTRUCTURE_SECURITY', FALSE, TRUE, TRUE)
+ON CONFLICT (principal_id) DO NOTHING;
+
