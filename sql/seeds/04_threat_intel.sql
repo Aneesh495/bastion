@@ -72,3 +72,14 @@ INSERT INTO intel_indicators_hash (
 ('ind-hsh-02', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'e3b0c44298fc1c149afbf4c8996fb924', 'CobaltStrike', 'DLL',   'BACKDOOR',    'act-apt29',  99.0, 'ReversingLabs',      '2026-02-15 00:00:00', TRUE),
 ('ind-hsh-03', '7d793037a0760186574b0282f2f435e7bb71f9d4d98f000123456789abcdef01', '7d793037a0760186574b0282f2f435e7', 'BlackCat', 'ELF64',     'RANSOMWARE',  'act-wizard', 99.0, 'CISA-Alert',         '2026-05-12 00:00:00', TRUE)
 ON CONFLICT (indicator_id) DO NOTHING;
+
+-- ----------------------------------------------------------------------------
+-- 6. Canonical Detection Rules Registry Metadata
+-- ----------------------------------------------------------------------------
+
+INSERT INTO detection_rules (rule_id, rule_code, name, tactic_id, technique_id, severity, base_risk_score, fidelity_score, evaluation_window_mins, suppression_period_mins, is_stateful, is_enabled) VALUES
+('rule-0101', 'BST-R-0101', 'Console Login Without MFA', 'tac-03', 'tech-1078-004', 'CRITICAL', 95.0, 92.0, 60, 120, FALSE, TRUE),
+('rule-0104', 'BST-R-0104', 'Web Ingress Application Attack', 'tac-03', 'tech-1190', 'HIGH', 90.0, 88.0, 60, 120, FALSE, TRUE),
+('rule-0202', 'BST-R-0202', 'Interactive Reverse Shell', 'tac-04', 'tech-1059-004', 'CRITICAL', 98.0, 96.0, 60, 120, FALSE, TRUE)
+ON CONFLICT (rule_id) DO NOTHING;
+

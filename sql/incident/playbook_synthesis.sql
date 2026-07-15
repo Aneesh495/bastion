@@ -27,7 +27,7 @@ SELECT
 FROM incidents i
 JOIN incident_alert_links l ON i.incident_id = l.incident_id
 JOIN detection_alerts a ON l.alert_id = a.alert_id
-WHERE a.entity_type = 'COMPUTE_ASSET'
+WHERE a.entity_type IN ('ASSET', 'COMPUTE_ASSET')
   AND i.current_state IN ('DETECTED', 'TRIAGED')
 
 UNION ALL
