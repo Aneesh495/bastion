@@ -39,8 +39,10 @@ lint: check-no-em-dash
 
 check-no-em-dash:
 	@echo "Verifying zero em dashes across all code and documentation files..."
-	@! grep -rn "—" sql/ docs/ bastion/ tests/ *.md 2>/dev/null || (echo "ERROR: Em dash found! Must not use em dashes." && exit 1)
-	@echo "Em dash check passed: zero em dashes found."
+	@$(PYTHON) -c "import sys, glob, os; bad = ['\u2014', '\u2013']; errs = 0; \
+files = [f for p in ['sql/**', 'docs/**', 'bastion/**', 'tests/**', 'bench/**', '*.md'] for f in glob.glob(p, recursive=True) if os.path.isfile(f)]; \
+[print(f'ERROR: Em/En dash in {f}:{i+1}') or sys.exit(1) for f in files for i, l in enumerate(open(f, encoding='utf-8', errors='ignore')) if any(b in l for b in bad)]; \
+print('Em dash check passed: zero em dashes found.')"
 
 clean:
 	@rm -rf .bastion_data build dist *.egg-info __pycache__ */__pycache__ */*/__pycache__ *.db *.sqlite *.duckdb
